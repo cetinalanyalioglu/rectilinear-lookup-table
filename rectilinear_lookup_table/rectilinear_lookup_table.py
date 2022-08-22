@@ -802,3 +802,41 @@ Axes:       {:s}
             result[k] = data[k]
 
         return result
+
+    @staticmethod
+    def axis_vector_as_array(shape: tuple, vector: np.ndarray, axis: int) -> np.ndarray:
+        """Given an axis vector and a table shape, constructs the corresponding field array of given shape.
+
+        Parameters
+        ----------
+        shape : tuple
+            Shape of table (e.g ndarray.shape)
+        vector : np.ndarray
+            Axis vector
+        axis : int
+            Index of target axis (e.g in ndarray.shape)
+
+        Returns
+        -------
+        np.ndarray
+            Corresponding field array
+        """
+
+        if shape[axis] != vector.size:
+            raise ValueError(
+                "Given vector of length {:d} does not match with length of target axis ({:d})".format(
+                    vector.size, shape[axis]
+                )
+            )
+
+        idx = len(shape) * [slice(None, None, None)]
+
+        array = np.empty(shape, dtype=vector.dtype)
+
+        for n in range(shape[axis]):
+            # Increment index corresponding to given axis
+            idx[axis] = n
+            # Set constant value taken from given (axis) vector for current slice
+            array[tuple(idx)] = np.full(array[tuple(idx)].shape, vector[n])
+
+        return array
